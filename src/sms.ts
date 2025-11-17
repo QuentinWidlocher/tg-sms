@@ -1,5 +1,6 @@
 import { config } from "./config.ts";
 import Client, { HttpClient } from "android-sms-gateway";
+import { parsePhoneNumber, parsePhoneNumberWithError } from "libphonenumber-js";
 
 const httpFetchClient: HttpClient = {
   get: async <T>(url: string, headers: Record<string, string>) => {
@@ -52,6 +53,10 @@ const smsApi = new Client(
   config.ANDROID_SMS_GATEWAY_URL
 );
 
+export function formatPhoneNumber(phoneNumber: string) {
+  return parsePhoneNumberWithError(phoneNumber).format("E.164");
+}
+
 export async function sendSMS(text: string, to: string) {
   console.log("✉️ Sending a SMS to ", to, ":", `"${text}"`);
 
@@ -62,7 +67,7 @@ export async function sendSMS(text: string, to: string) {
       withDeliveryReport: true,
     });
 
-    console.debug("🎉 SMS sent", result);
+    console.log("🎉 SMS sent", result);
   } catch (e) {
     console.error(e);
   }

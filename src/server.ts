@@ -1,8 +1,9 @@
 import { serve } from "bun";
 import { TelegramError, webhookHandler } from "gramio";
-import { bot } from "../bot.ts";
-import { config } from "../config.ts";
-import { kvGet, kvSet } from "../kv.ts";
+import { bot } from "./bot.ts";
+import { config } from "./config.ts";
+import { kvGet, kvSet } from "./kv.ts";
+import { formatPhoneNumber } from "./sms.ts";
 
 const botWebhookPath = `/${config.BOT_TOKEN}`;
 const handler = webhookHandler(bot, "Bun.serve");
@@ -38,10 +39,13 @@ export function runServer() {
               name: event.payload.phoneNumber,
             });
 
-            await kvSet(`phone-${event.payload.phoneNumber}`, {
-              chatId: chatId,
-              threadId: String(topic.message_thread_id),
-            });
+            await kvSet(
+              `phone-${formatPhoneNumber(event.payload.phoneNumber)}`,
+              {
+                chatId: chatId,
+                threadId: String(topic.message_thread_id),
+              }
+            );
 
             console.debug("Created topic", topic);
 
@@ -49,7 +53,7 @@ export function runServer() {
           }
 
           const chatAndThreadId = await kvGet(
-            `phone-${event.payload.phoneNumber}`
+            `phone-${formatPhoneNumber(event.payload.phoneNumber)}`
           );
 
           let chatId: string | undefined = undefined;
@@ -106,6 +110,9 @@ export function runServer() {
 
           return new Response();
         },
+      },
+      ["/ping"]: () => {
+        return new Response(new Date().toISOString(), { status: 200 });
       },
     },
     fetch(req) {

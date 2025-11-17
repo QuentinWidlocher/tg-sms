@@ -1,6 +1,6 @@
 import { bot } from "./bot.ts";
 import { config } from "./config.ts";
-import { runServer } from "./server/index.ts";
+import { runServer } from "./server.ts";
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught exception:", error);

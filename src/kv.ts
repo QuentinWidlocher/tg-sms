@@ -10,29 +10,19 @@ type KVTypes = EnsureJsonifiable<{
 
 // keyvalue doesn't support empty values, so we use "null" instead...
 export async function kvClear<K extends keyof KVTypes>(key: K) {
-  console.group("kvClear", { key });
-
   const url = `https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${
     config.KV_APP_KEY
   }/${Buffer.from(key).toString("base64url")}/null`;
 
-  console.debug("url", url);
-
-  const result = await fetch(url, {
+  await fetch(url, {
     method: "POST",
   });
-
-  console.log(result);
-
-  console.groupEnd();
 }
 
 export async function kvSet<K extends keyof KVTypes>(
   key: K,
   value: KVTypes[K]
 ) {
-  console.group("kvSet", { key, value });
-
   const params = new URLSearchParams(value);
 
   const url = `https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${
@@ -41,27 +31,14 @@ export async function kvSet<K extends keyof KVTypes>(
     params.toString()
   ).toString("base64url")}`;
 
-  console.debug("url", url);
-
-  const result = await fetch(url, {
+  await fetch(url, {
     method: "POST",
   });
-
-  console.log(result);
-
-  console.groupEnd();
 }
 
 export async function kvGet<K extends keyof KVTypes>(
   key: K
 ): Promise<KVTypes[K] | null> {
-  console.group("kvGet", { key });
-
-  console.debug(
-    "Buffer.from(key).toString('base64url')",
-    Buffer.from(key).toString("base64url")
-  );
-
   const response = await fetch(
     `https://keyvalue.immanuel.co/api/KeyVal/GetValue/${
       config.KV_APP_KEY
@@ -72,9 +49,6 @@ export async function kvGet<K extends keyof KVTypes>(
   );
 
   const asText = (await response.json()) as JsonValue;
-
-  console.debug("asText", asText);
-  console.debug("!asText", !asText);
 
   if (!response.ok) {
     throw new Error();
@@ -87,8 +61,6 @@ export async function kvGet<K extends keyof KVTypes>(
   const params = new URLSearchParams(
     Buffer.from(asText.toString(), "base64url").toString()
   );
-  console.debug("params", params);
 
-  console.groupEnd();
   return params.toJSON() as KVTypes[K];
 }

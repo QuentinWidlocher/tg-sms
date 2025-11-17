@@ -1,19 +1,13 @@
-import { autoAnswerCallbackQuery } from "@gramio/auto-answer-callback-query";
-import { mediaCache } from "@gramio/media-cache";
-import { mediaGroup } from "@gramio/media-group";
-import { prompt } from "@gramio/prompt";
 import { bold, Bot, format, italic } from "gramio";
 import { config } from "./config.ts";
-import { isValidPhoneNumber } from "libphonenumber-js";
-import { getDeviceID, sendSMS } from "./sms.ts";
+import { formatPhoneNumber, getDeviceID, sendSMS } from "./sms.ts";
 import { kvClear, kvSet } from "./kv.ts";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export const bot = new Bot(config.BOT_TOKEN)
-  .extend(autoAnswerCallbackQuery())
-  .extend(mediaGroup())
-  .extend(mediaCache())
-  .extend(prompt())
   .on("new_chat_members", async (context) => {
+    //
+    // Only cares for itself
     if (!context.eventMembers.some((member) => member.id == bot.info?.id)) {
       return;
     }
@@ -31,8 +25,9 @@ export const bot = new Bot(config.BOT_TOKEN)
       );
     }
 
+    // We remember that this device is linked to this specific chat
+    // Useful to create a topic on sms received later
     const deviceId = await getDeviceID();
-
     await kvSet(`device-${deviceId}`, { chatId: String(context.chatId) });
 
     return context.send(format`
@@ -47,25 +42,24 @@ export const bot = new Bot(config.BOT_TOKEN)
     `);
   })
   .on("forum_topic_created", async (context) => {
-    console.debug("context.name", context.name);
     if (!isValidPhoneNumber(context.name)) {
       return context.send(
         format`⚠️ The topic name is not a valid phone number.
           ${bold`You won't be able to send messages to it.`}
 
           If you made a typo in the number, ${bold`delete and recreate`} the topic. (renaming won't work.)
-          Make sure your number is in a valid international format (may start with +)
+          Make sure your number is in a valid international format (starts with +)
           `
       );
     }
 
-    await kvSet(`phone-${context.name}`, {
+    await kvSet(`phone-${formatPhoneNumber(context.name)}`, {
       chatId: String(context.chatId),
       threadId: String(context.threadId)!,
     });
 
     return context.send(
-      `This will be your conversation with ${context.name}.
+      format`This will be your conversation with ${context.name}.
 
       You can now rename the topic to the right contact name.`
     );

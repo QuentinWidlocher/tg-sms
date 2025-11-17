@@ -25,6 +25,4 @@ export const config = {
     .get("API_URL")
     .default(`https://${env.get("PUBLIC_DOMAIN").asString()}`)
     .asString(),
-  DATABASE_URL: env.get("DATABASE_URL").required().asString(),
-  LOCK_STORE: env.get("LOCK_STORE").default("memory").asEnum(["memory"]),
 };
