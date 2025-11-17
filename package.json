@@ -1,0 +1,32 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "NODE_ENV=production bun src/index.ts",
+    "lint": "bun x @biomejs/biome check",
+    "lint:fix": "bun run lint --fix",
+    "generate": "bun x drizzle-kit generate",
+    "push": "bun x drizzle-kit push",
+    "migrate": "bun x drizzle-kit migrate",
+    "studio": "bun x drizzle-kit studio"
+  },
+  "dependencies": {
+    "@gramio/auto-answer-callback-query": "^0.0.2",
+    "@gramio/media-cache": "^0.0.4",
+    "@gramio/media-group": "^0.0.4",
+    "@gramio/prompt": "^1.2.1",
+    "@gramio/views": "^0.0.5",
+    "@verrou/core": "^0.5.1",
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.5",
+    "env-var": "^7.5.0",
+    "gramio": "^0.4.10",
+    "libphonenumber-js": "^1.12.26"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "@types/bun": "^1.2.21",
+    "@biomejs/biome": "^2.2.3"
+  }
+}
