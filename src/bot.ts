@@ -2,10 +2,11 @@ import { autoAnswerCallbackQuery } from "@gramio/auto-answer-callback-query";
 import { mediaCache } from "@gramio/media-cache";
 import { mediaGroup } from "@gramio/media-group";
 import { prompt } from "@gramio/prompt";
-import { bold, Bot, format } from "gramio";
+import { bold, Bot, format, italic } from "gramio";
 import { config } from "./config.ts";
 import { isValidPhoneNumber } from "libphonenumber-js";
-import { sendSMS } from "./sms.ts";
+import { getDeviceID, sendSMS } from "./sms.ts";
+import { kvClear, kvSet } from "./kv.ts";
 
 export const bot = new Bot(config.BOT_TOKEN)
   .extend(autoAnswerCallbackQuery())
@@ -30,6 +31,10 @@ export const bot = new Bot(config.BOT_TOKEN)
       );
     }
 
+    const deviceId = await getDeviceID();
+
+    await kvSet(`device-${deviceId}`, { chatId: String(context.chatId) });
+
     return context.send(format`
       ${bold`Telegram ↔ SMS`}
 
@@ -37,19 +42,38 @@ export const bot = new Bot(config.BOT_TOKEN)
 
       - Wait for someone to send you a SMS, it will create a topic with their phone number.
       - Create a topic with a phone number as a name, you can rename it later.
+
+      ${italic`Don't forget to give this bot admin "topic" rights.`}
     `);
   })
-  .on("forum_topic_created", (context) => {
+  .on("forum_topic_created", async (context) => {
     console.debug("context.name", context.name);
     if (!isValidPhoneNumber(context.name)) {
       return context.send(
-        "The topic name is not a valid phone number. **Delete it** and create another."
+        format`⚠️ The topic name is not a valid phone number.
+          ${bold`You won't be able to send messages to it.`}
+
+          If you made a typo in the number, ${bold`delete and recreate`} the topic. (renaming won't work.)
+          Make sure your number is in a valid international format (may start with +)
+          `
       );
     }
 
+    await kvSet(`phone-${context.name}`, {
+      chatId: String(context.chatId),
+      threadId: String(context.threadId)!,
+    });
+
     return context.send(
-      `This will be your conversation with ${context.name}. You can now rename the topic to the right contact name.`
+      `This will be your conversation with ${context.name}.
+
+      You can now rename the topic to the right contact name.`
     );
+  })
+  .on("forum_topic_closed", async (context) => {
+    console.debug("forum_topic_closed", context);
+
+    await kvClear(`phone-${context.name}`);
   })
   .on("edited_message", async (context) => {
     if (!context.hasText() || !context.text) {

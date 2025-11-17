@@ -1,50 +1,80 @@
-import { $ } from "bun";
 import { config } from "./config.ts";
+import Client, { HttpClient } from "android-sms-gateway";
+
+const httpFetchClient: HttpClient = {
+  get: async <T>(url: string, headers: Record<string, string>) => {
+    const response = await fetch(url, {
+      method: "GET",
+      headers,
+    });
+
+    return response.json() as Promise<T>;
+  },
+  post: async <T>(url: string, body: any, headers: Record<string, string>) => {
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    return response.json() as Promise<T>;
+  },
+  delete: async <T>(url: string, headers: Record<string, string>) => {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers,
+    });
+
+    return response.json() as Promise<T>;
+  },
+  put: async <T>(url: string, headers: Record<string, string>) => {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers,
+    });
+
+    return response.json() as Promise<T>;
+  },
+  patch: async <T>(url: string, headers: Record<string, string>) => {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers,
+    });
+
+    return response.json() as Promise<T>;
+  },
+};
+
+const smsApi = new Client(
+  config.ANDROID_SMS_GATEWAY_USERNAME,
+  config.ANDROID_SMS_GATEWAY_PASSWORD,
+  httpFetchClient,
+  config.ANDROID_SMS_GATEWAY_URL
+);
 
 export async function sendSMS(text: string, to: string) {
-  const url = new URL(config.ANDROID_SMS_GATEWAY_URL);
+  console.log("✉️ Sending a SMS to ", to, ":", `"${text}"`);
 
-  console.log("✉️ Sending a SMS to ", to, ': "', text, '"');
-
-  await fetch(url + "/message", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Basic ${btoa(
-        config.ANDROID_SMS_GATEWAY_USERNAME +
-          ":" +
-          config.ANDROID_SMS_GATEWAY_PASSWORD
-      )}`,
-    },
-    keepalive: false,
-    body: JSON.stringify({
-      textMessage: {
-        text: text,
-      },
+  try {
+    const result = await smsApi.send({
+      message: text,
       phoneNumbers: [to],
-    }),
-  });
+      withDeliveryReport: true,
+    });
 
-  console.log("SMS sent");
+    console.debug("🎉 SMS sent", result);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-export async function registerWebhooks(userId: string) {
-  const url = new URL(config.ANDROID_SMS_GATEWAY_URL);
-  url.username = config.ANDROID_SMS_GATEWAY_USERNAME;
-  url.password = config.ANDROID_SMS_GATEWAY_PASSWORD;
+export async function getDeviceID() {
+  const devices = await smsApi.getDevices();
+  const mainDevice = devices.filter((d) => !d.deletedAt).at(0);
 
-  console.debug(
-    'config.API_URL + "/sms-webhook"',
-    config.API_URL + "/sms-webhook"
-  );
+  if (!mainDevice) {
+    throw new Error("No devices where found");
+  }
 
-  // Fetch throws a weird error about FailedToOpenSocket
-  await $`curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '${JSON.stringify({
-    id: userId,
-    url: config.API_URL + "/sms-webhook",
-    event: "sms:received",
-  })}' \
-  ${url.toString()}/webhooks`;
+  return mainDevice.id;
 }

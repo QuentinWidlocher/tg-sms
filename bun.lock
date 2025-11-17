@@ -10,6 +10,7 @@
         "@gramio/prompt": "^1.2.1",
         "@gramio/views": "^0.0.5",
         "@verrou/core": "^0.5.1",
+        "android-sms-gateway": "^3.0.0",
         "drizzle-kit": "^0.31.4",
         "drizzle-orm": "^0.44.5",
         "env-var": "^7.5.0",
@@ -19,6 +20,7 @@
       "devDependencies": {
         "@biomejs/biome": "^2.2.3",
         "@types/bun": "^1.2.21",
+        "type-fest": "^5.2.0",
         "typescript": "^5.9.2",
       },
     },
@@ -146,6 +148,8 @@
 
     "@verrou/core": ["@verrou/core@0.5.1", "", { "dependencies": { "@lukeed/ms": "^2.0.2", "@poppinss/utils": "^6.8.2", "async-mutex": "^0.5.0", "typescript-log": "^2.0.0" }, "peerDependencies": { "@aws-sdk/client-dynamodb": "^3.484.0", "ioredis": "^5.3.2" }, "optionalPeers": ["@aws-sdk/client-dynamodb", "ioredis"] }, "sha512-A/hMtOSBgXKfYWFrLJAsqiE4VwvyaYW0thf7kdkAhBBdDVIr50o45tONjJ21EIjRi7s1G7A2zWwtzhrHnycoiQ=="],
 
+    "android-sms-gateway": ["android-sms-gateway@3.0.0", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-F9nHnXyWrpCKHa5s0O+sDPDpn2QgcEbm9GKI0FAIGZVM7QQQH5fJAzilsbMuACJzI1BSPHRwoI7rRgSMQeHrJw=="],
+
     "async-mutex": ["async-mutex@0.5.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA=="],
 
     "buffer-from": ["buffer-from@1.1.2", "", {}, "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ=="],
@@ -198,9 +202,13 @@
 
     "source-map-support": ["source-map-support@0.5.21", "", { "dependencies": { "buffer-from": "^1.0.0", "source-map": "^0.6.0" } }, "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w=="],
 
+    "tagged-tag": ["tagged-tag@1.0.0", "", {}, "sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng=="],
+
     "truncatise": ["truncatise@0.0.8", "", {}, "sha512-cXzueh9pzBCsLzhToB4X4gZCb3KYkrsAcBAX97JnazE74HOl3cpBJYEV7nabHeG/6/WXCU5Yujlde/WPBUwnsg=="],
 
     "tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
+
+    "type-fest": ["type-fest@5.2.0", "", { "dependencies": { "tagged-tag": "^1.0.0" } }, "sha512-xxCJm+Bckc6kQBknN7i9fnP/xobQRsRQxR01CztFkp/h++yfVxUUcmMgfR2HttJx/dpWjS9ubVuyspJv24Q9DA=="],
 
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 

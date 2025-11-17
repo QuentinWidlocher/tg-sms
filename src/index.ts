@@ -1,17 +1,6 @@
 import { bot } from "./bot.ts";
 import { config } from "./config.ts";
-import { server } from "./server/index.ts";
-
-const signals = ["SIGINT", "SIGTERM"];
-
-for (const signal of signals) {
-  process.on(signal, async () => {
-    console.log(`Received ${signal}. Initiating graceful shutdown...`);
-    server.stop();
-    await bot.stop();
-    process.exit(0);
-  });
-}
+import { runServer } from "./server/index.ts";
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught exception:", error);
@@ -28,3 +17,5 @@ if (config.NODE_ENV === "production")
     },
   });
 else await bot.start();
+
+runServer();

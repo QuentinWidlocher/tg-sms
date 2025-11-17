@@ -18,6 +18,7 @@
     "@gramio/prompt": "^1.2.1",
     "@gramio/views": "^0.0.5",
     "@verrou/core": "^0.5.1",
+    "android-sms-gateway": "^3.0.0",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.5",
     "env-var": "^7.5.0",
@@ -25,8 +26,9 @@
     "libphonenumber-js": "^1.12.26"
   },
   "devDependencies": {
-    "typescript": "^5.9.2",
+    "@biomejs/biome": "^2.2.3",
     "@types/bun": "^1.2.21",
-    "@biomejs/biome": "^2.2.3"
+    "type-fest": "^5.2.0",
+    "typescript": "^5.9.2"
   }
 }

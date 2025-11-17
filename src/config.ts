@@ -9,7 +9,7 @@ export const config = {
   ANDROID_SMS_GATEWAY_URL: env
     .get("ANDROID_SMS_GATEWAY_URL")
     .required()
-    .asUrlObject(),
+    .asUrlString(),
   ANDROID_SMS_GATEWAY_USERNAME: env
     .get("ANDROID_SMS_GATEWAY_USERNAME")
     .required()
@@ -18,6 +18,7 @@ export const config = {
     .get("ANDROID_SMS_GATEWAY_PASSWORD")
     .required()
     .asString(),
+  KV_APP_KEY: env.get("KV_APP_KEY").required().asString(),
 
   PORT: env.get("PORT").default(3000).asPortNumber(),
   API_URL: env
