@@ -7,6 +7,7 @@ type KVTypes = EnsureJsonifiable<{
   [k: `phone-${string}`]: { chatId: string; threadId: string };
   [k: `device-${string}`]: { chatId: string };
   [k: `message-${string}`]: { receivedAt: string };
+  [k: `sent-message-${string}`]: { chatId: string; messageId: string };
 }>;
 
 // keyvalue doesn't support empty values, so we use "null" instead...

@@ -162,6 +162,21 @@ export const bot = new Bot(config.BOT_TOKEN)
       return context.send("You need to talk in a topic");
     }
 
-    await sendSMS(context.text, context.replyMessage.forumTopicCreated.name);
+    try {
+      const sentMessage = await sendSMS(
+        context.text,
+        context.replyMessage.forumTopicCreated.name
+      );
+
+      await Promise.all([
+        kvSet(`sent-message-${sentMessage.id}`, {
+          chatId: String(context.chatId),
+          messageId: String(context.id),
+        }),
+        context.setReaction({ type: "emoji", emoji: "✍" }),
+      ]);
+    } catch (e) {
+      await context.setReaction({ type: "emoji", emoji: "👎" });
+    }
   })
   .onStart(({ info }) => console.log(`✨ Bot ${info.username} was started!`));
