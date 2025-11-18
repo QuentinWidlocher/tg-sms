@@ -1,6 +1,4 @@
-import Client, {
-  HttpClient
-} from "android-sms-gateway";
+import Client, { HttpClient } from "android-sms-gateway";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 import { config } from "./config.ts";
 

@@ -1,4 +1,11 @@
-import { bold, Bot, code, format, italic } from "gramio";
+import {
+  bold,
+  Bot,
+  code,
+  format,
+  italic,
+  type TelegramBotCommandScope,
+} from "gramio";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { config } from "./config.ts";
 import { kvClear, kvSet } from "./kv.ts";
@@ -89,18 +96,19 @@ export const bot = new Bot(config.BOT_TOKEN)
     );
   })
   .command("start", async (context) => {
+    console.debug("start", context);
     await bot.api.setMyCommands({
       commands: [
         {
-          command: "registerWebhook",
+          command: "register_webhook",
           description: "Listen on url for sms events",
         },
         {
-          command: "listWebhooks",
+          command: "list_webhooks",
           description: "List all webhook urls",
         },
         {
-          command: "deleteWebhook",
+          command: "delete_webhook",
           description: "Remove a single url from registered webhooks",
         },
       ],
@@ -113,7 +121,7 @@ export const bot = new Bot(config.BOT_TOKEN)
 
       Then add this bot to a group with topics !`);
   })
-  .command("registerWebhook", async (context) => {
+  .command("register_webhook", async (context) => {
     if (!context.args) {
       return context.send(
         format`Call this command with your webhook url (${code`https://<your_api_url>/sms-webhook`})`
@@ -132,7 +140,7 @@ export const bot = new Bot(config.BOT_TOKEN)
       }
     }
   })
-  .command("listWebhooks", async (context) => {
+  .command("list_webhooks", async (context) => {
     const webhooks = await listWebhook();
 
     const list = webhooks
@@ -145,7 +153,7 @@ export const bot = new Bot(config.BOT_TOKEN)
      You can delete them with ${code`/deleteWebhook <number/url>`}
      `);
   })
-  .command("deleteWebhook", async (context) => {
+  .command("delete_webhook", async (context) => {
     if (!context.args) {
       return context.send(
         format`Call this command with a webhook url or a number (given by ${code`/listWebhooks`})`
