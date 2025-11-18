@@ -1,6 +1,13 @@
-import { bold, Bot, format, italic } from "gramio";
+import { bold, Bot, code, format, italic } from "gramio";
 import { config } from "./config.ts";
-import { formatPhoneNumber, getDeviceID, sendSMS } from "./sms.ts";
+import {
+  deleteWebhook,
+  formatPhoneNumber,
+  getDeviceID,
+  listWebhook,
+  registerWebhook,
+  sendSMS,
+} from "./sms.ts";
 import { kvClear, kvSet } from "./kv.ts";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
@@ -87,6 +94,57 @@ export const bot = new Bot(config.BOT_TOKEN)
       context.replyMessage.forumTopicCreated.name
     );
   })
+  .command("start", (context) => {
+    return context.send("Add this bot to a supergroup with topics !");
+  })
+  .command("setupWebhook", async (context) => {
+    if (!context.args) {
+      return context.send(
+        format`Call this command with your webhook url (${code`https://<your_api_url>/sms-webhook`})`
+      );
+    }
+
+    try {
+      const url = new URL(context.args);
+      await registerWebhook(url);
+      return context.send(format`URL registered ✅`);
+    } catch (e) {
+      if (e instanceof TypeError) {
+        return context.send(
+          format`URL is not valid, please call this command with your webhook url (${code`https://<your_api_url>/sms-webhook`})`
+        );
+      }
+    }
+  })
+  .command("listWebhooks", async (context) => {
+    const webhooks = await listWebhook();
+
+    const list = webhooks
+      .map((w, i) => `- (${i + 1}) ${code`${w}`}`)
+      .join("\n");
+
+    context.send(format`${bold`Your registered webhooks`}
+     ${list}
+
+     You can delete them with ${code`/deleteWebhook <number/url>`}
+     `);
+  })
+  .command("deleteWebhook", async (context) => {
+    if (!context.args) {
+      return context.send(
+        format`Call this command with a webhook url or a number (given by ${code`/listWebhooks`})`
+      );
+    }
+
+    try {
+      await deleteWebhook(context.args);
+      return context.send(format`URL deleted ❎`);
+    } catch (e) {
+      if (e instanceof Error) {
+        return context.send(e.message);
+      }
+    }
+  })
   .on("message", async (context) => {
     console.debug("on message", context);
 
@@ -105,8 +163,5 @@ export const bot = new Bot(config.BOT_TOKEN)
     }
 
     await sendSMS(context.text, context.replyMessage.forumTopicCreated.name);
-  })
-  .command("start", (context) => {
-    return context.send("Add this bot to a supergroup with topics !");
   })
   .onStart(({ info }) => console.log(`✨ Bot ${info.username} was started!`));

@@ -1,5 +1,5 @@
 import { config } from "./config.ts";
-import Client, { HttpClient } from "android-sms-gateway";
+import Client, { HttpClient, WebHookEventType } from "android-sms-gateway";
 import { parsePhoneNumber, parsePhoneNumberWithError } from "libphonenumber-js";
 
 const httpFetchClient: HttpClient = {
@@ -82,4 +82,38 @@ export async function getDeviceID() {
   }
 
   return mainDevice.id;
+}
+
+export async function registerWebhook(url: URL) {
+  return smsApi.registerWebhook({
+    event: WebHookEventType.SmsReceived,
+    url: url.toString(),
+  });
+}
+
+export async function listWebhook() {
+  const res = await smsApi.getWebhooks();
+  return res.toSorted((a, b) => a.url.localeCompare(b.url)).map((r) => r.url);
+}
+
+export async function deleteWebhook(entry: string | number) {
+  const webhooks = await smsApi.getWebhooks();
+
+  if (isNaN(Number(entry))) {
+    const foundWebhook = webhooks.find((w) => w.url == entry)?.id;
+    if (!foundWebhook) {
+      throw new Error("Webhook not found");
+    }
+
+    return smsApi.deleteWebhook(foundWebhook);
+  } else {
+    const foundWebhook = webhooks
+      .toSorted((a, b) => a.url.localeCompare(b.url))
+      .at(Number(entry) - 1)?.id;
+    if (!foundWebhook) {
+      throw new Error("Webhook not found");
+    }
+
+    return smsApi.deleteWebhook(foundWebhook);
+  }
 }

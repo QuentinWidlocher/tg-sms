@@ -31,6 +31,14 @@ export function runServer() {
             webhookId: string;
           };
 
+          const existingMessage = await kvGet(
+            `message-${event.payload.messageId}`
+          );
+
+          if (existingMessage) {
+            return new Response(undefined, { status: 202 });
+          }
+
           console.debug("📥 Received an SMS", event);
 
           async function createTopic(chatId: string) {
@@ -107,6 +115,10 @@ export function runServer() {
               });
             }
           }
+
+          await kvSet(`message-${event.payload.messageId}`, {
+            receivedAt: event.payload.receivedAt,
+          });
 
           return new Response();
         },

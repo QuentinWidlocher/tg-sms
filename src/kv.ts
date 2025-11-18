@@ -6,6 +6,7 @@ type EnsureJsonifiable<T extends Record<string, Stringified<Jsonifiable>>> = T;
 type KVTypes = EnsureJsonifiable<{
   [k: `phone-${string}`]: { chatId: string; threadId: string };
   [k: `device-${string}`]: { chatId: string };
+  [k: `message-${string}`]: { receivedAt: string };
 }>;
 
 // keyvalue doesn't support empty values, so we use "null" instead...
@@ -51,7 +52,7 @@ export async function kvGet<K extends keyof KVTypes>(
   const asText = (await response.json()) as JsonValue;
 
   if (!response.ok) {
-    throw new Error();
+    throw new Error(`${response.status} ${response.statusText}`);
   }
 
   if (!asText || asText == "null") {
