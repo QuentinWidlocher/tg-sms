@@ -1,5 +1,5 @@
-import { config } from "./config";
 import type { Jsonifiable, JsonValue, Stringified } from "type-fest";
+import { config } from "./config";
 
 type EnsureJsonifiable<T extends Record<string, Stringified<Jsonifiable>>> = T;
 

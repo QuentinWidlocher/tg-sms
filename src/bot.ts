@@ -1,15 +1,9 @@
 import { bold, Bot, code, format, italic } from "gramio";
-import { config } from "./config.ts";
-import {
-  deleteWebhook,
-  formatPhoneNumber,
-  getDeviceID,
-  listWebhook,
-  registerWebhook,
-  sendSMS,
-} from "./sms.ts";
-import { kvClear, kvSet } from "./kv.ts";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { config } from "./config.ts";
+import { kvClear, kvSet } from "./kv.ts";
+import { getDeviceID, formatPhoneNumber, sendSMS } from "./sms.ts";
+import { registerWebhook, listWebhook, deleteWebhook } from "./webhooks.ts";
 
 export const bot = new Bot(config.BOT_TOKEN)
   .on("new_chat_members", async (context) => {
@@ -94,10 +88,32 @@ export const bot = new Bot(config.BOT_TOKEN)
       context.replyMessage.forumTopicCreated.name
     );
   })
-  .command("start", (context) => {
-    return context.send("Add this bot to a supergroup with topics !");
+  .command("start", async (context) => {
+    await bot.api.setMyCommands({
+      commands: [
+        {
+          command: "registerWebhook",
+          description: "Listen on url for sms events",
+        },
+        {
+          command: "listWebhooks",
+          description: "List all webhook urls",
+        },
+        {
+          command: "deleteWebhook",
+          description: "Remove a single url from registered webhooks",
+        },
+      ],
+    });
+    return context.send(format`
+      ${bold`Telegram ↔ SMS`}
+
+      Register your hosted api webhook url with
+      ${code`/registerWebhook https://<your_api_url>/sms-webhook`}
+
+      Then add this bot to a group with topics !`);
   })
-  .command("setupWebhook", async (context) => {
+  .command("registerWebhook", async (context) => {
     if (!context.args) {
       return context.send(
         format`Call this command with your webhook url (${code`https://<your_api_url>/sms-webhook`})`

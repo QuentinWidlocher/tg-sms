@@ -36,7 +36,7 @@ I used [Render](https://render.com/docs/deploy-bun-docker) to host.
 
 - Fill out env variables with the info you got (this is the part where I cannot make this work for everyone)
 - Also set your `API_URL` with the url you hosted
-- In the bot conversation, send `/setupWebhook <API_URL>/sms-webhook`
+- In the bot conversation, send `/registerWebhook <API_URL>/sms-webhook`
 - Invite your bot in your chat
 - Make sure to give it the rights to manage topics
 - Create a new topic with a *phone number* (make sure to prefix with +XX)

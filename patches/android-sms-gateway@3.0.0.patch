@@ -1,0 +1,96 @@
+diff --git a/node_modules/android-sms-gateway/.bun-tag-42d5afb71eaa591e b/.bun-tag-42d5afb71eaa591e
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/android-sms-gateway/.bun-tag-775f07a0ddef17c8 b/.bun-tag-775f07a0ddef17c8
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index 713dfb0e95af59cfe9357d459207d7214a8c3a0e..dcc1124078759e071480f45c7c135b25f7e99d35 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -99,7 +99,11 @@ export declare enum WebHookEventType {
+ 	/**
+ 	 * Indicates that an SMS message has failed to be sent.
+ 	 */
+-	SmsFailed = "sms:failed"
++	SmsFailed = "sms:failed",
++	/**
++	 * Indicates that a new SMS message has been received.
++	 */
++	MmsReceived = "mms:received"
+ }
+ /**
+  * Represents a request to create or update a webhook.
+@@ -414,6 +418,10 @@ export type WebHookPayload =
+ 	 * The event type.
+ 	 */
+ 	event: WebHookEventType.SmsReceived;
++	/**
++	 * The ID of the device
++	 */
++	deviceId: string;
+ 	/**
+ 	 * The payload of the event.
+ 	 */
+@@ -422,6 +430,40 @@ export type WebHookPayload =
+ 		 * The received message.
+ 		 */
+ 		message: string;
++		/**
++		 * The message ID.
++		 */
++    messageId: string;
++		/**
++		 * The phone number of the sender.
++		 */
++		phoneNumber: string;
++		/**
++		 * The date and time of when the message was received.
++		 */
++		receivedAt: string;
++	};
++} |
++/**
++ * Represents the payload of a webhook event of type `MmsReceived`.
++ */
++{
++	/**
++	 * The event type.
++	 */
++	event: WebHookEventType.MmsReceived;
++	/**
++	 * The ID of the device
++	 */
++	deviceId: string;
++	/**
++	 * The payload of the event.
++	 */
++	payload: {
++		/**
++		 * The message ID.
++		 */
++    messageId: string;
+ 		/**
+ 		 * The phone number of the sender.
+ 		 */
+@@ -430,6 +472,8 @@ export type WebHookPayload =
+ 		 * The date and time of when the message was received.
+ 		 */
+ 		receivedAt: string;
++    subject: string;
++    size: number,
+ 	};
+ } | 
+ /**
+diff --git a/dist/index.js b/dist/index.js
+index 6ea215455583ca99c50333b762351b33422ea5c9..81eedc82c7ace74837c70489b68091d25a941b56 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -137,6 +137,7 @@ var ProcessState;
+ var WebHookEventType;
+ ((WebHookEventType2) => {
+   WebHookEventType2["SmsReceived"] = "sms:received";
++  WebHookEventType2["MmsReceived"] = "mms:received";
+   WebHookEventType2["SystemPing"] = "system:ping";
+   WebHookEventType2["SmsSent"] = "sms:sent";
+   WebHookEventType2["SmsDelivered"] = "sms:delivered";

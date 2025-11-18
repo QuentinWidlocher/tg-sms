@@ -2,12 +2,13 @@ import { serve } from "bun";
 import { webhookHandler } from "gramio";
 import { bot } from "./bot.ts";
 import { config } from "./config.ts";
+import { WebHookEventType, type WebHookPayload } from "android-sms-gateway";
 import {
+  onMessageReceived,
   onMessageDelivered,
   onMessageFailed,
-  onMessageReceived,
-} from "./sms.ts";
-import { WebHookEventType, type WebHookPayload } from "android-sms-gateway";
+  onMMSReceived,
+} from "./webhooks.ts";
 
 const botWebhookPath = `/${config.BOT_TOKEN}`;
 const handler = webhookHandler(bot, "Bun.serve");
@@ -22,6 +23,7 @@ export function runServer() {
       "/sms-webhook": {
         POST: async (req) => {
           const event = (await req.json()) as WebHookPayload;
+          console.debug("sms webhook event", event);
 
           if (event.event == WebHookEventType.SmsReceived) {
             await onMessageReceived(event);
@@ -33,6 +35,10 @@ export function runServer() {
 
           if (event.event == WebHookEventType.SmsFailed) {
             await onMessageFailed(event);
+          }
+
+          if (event.event == WebHookEventType.MmsReceived) {
+            await onMMSReceived(event);
           }
 
           return new Response();

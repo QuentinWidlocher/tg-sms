@@ -15,5 +15,8 @@
     "@types/bun": "^1.2.21",
     "type-fest": "^5.2.0",
     "typescript": "^5.9.2"
+  },
+  "patchedDependencies": {
+    "android-sms-gateway@3.0.0": "patches/android-sms-gateway@3.0.0.patch"
   }
 }
