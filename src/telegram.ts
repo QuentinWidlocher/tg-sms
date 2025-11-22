@@ -36,7 +36,7 @@ export async function createTopic(phoneNumber: string, chatId: string) {
     name: phoneNumber,
   });
 
-  await kvSet(`phone-${formatPhoneNumber(phoneNumber)}`, {
+  await kvSet(`phone-${formatPhoneNumber(phoneNumber, true)}`, {
     chatId: chatId,
     threadId: String(topic.message_thread_id),
   });
@@ -56,7 +56,7 @@ export async function getOrCreateTopic({
   deviceId: string;
 }) {
   const chatAndThreadId = await kvGet(
-    `phone-${formatPhoneNumber(phoneNumber)}`
+    `phone-${formatPhoneNumber(phoneNumber, true)}`
   );
 
   let chatId: string | undefined = undefined;

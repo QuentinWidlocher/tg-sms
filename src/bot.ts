@@ -50,7 +50,23 @@ export const bot = new Bot(config.BOT_TOKEN)
     `);
   })
   .on("forum_topic_created", async (context) => {
-    if (!isValidPhoneNumber(context.name)) {
+    try {
+      await kvSet(`phone-${formatPhoneNumber(context.name)}`, {
+        chatId: String(context.chatId),
+        threadId: String(context.threadId)!,
+      });
+
+      return context.send(
+        format`This will be your conversation with ${context.name}.
+
+        You can now rename the topic to the right contact name.`
+      );
+    } catch (e) {
+      await kvSet(`phone-${formatPhoneNumber(context.name, true)}`, {
+        chatId: String(context.chatId),
+        threadId: String(context.threadId)!,
+      });
+
       return context.send(
         format`⚠️ The topic name is not a valid phone number.
           ${bold`You won't be able to send messages to it.`}
@@ -60,17 +76,6 @@ export const bot = new Bot(config.BOT_TOKEN)
           `
       );
     }
-
-    await kvSet(`phone-${formatPhoneNumber(context.name)}`, {
-      chatId: String(context.chatId),
-      threadId: String(context.threadId)!,
-    });
-
-    return context.send(
-      format`This will be your conversation with ${context.name}.
-
-      You can now rename the topic to the right contact name.`
-    );
   })
   .on("forum_topic_closed", async (context) => {
     console.debug("forum_topic_closed", context);

@@ -1,5 +1,5 @@
 import Client, { HttpClient } from "android-sms-gateway";
-import { parsePhoneNumberWithError } from "libphonenumber-js";
+import { ParseError, parsePhoneNumberWithError } from "libphonenumber-js";
 import { config } from "./config.ts";
 
 const httpFetchClient: HttpClient = {
@@ -53,8 +53,19 @@ export const smsApi = new Client(
   config.ANDROID_SMS_GATEWAY_URL
 );
 
-export function formatPhoneNumber(phoneNumber: string) {
-  return parsePhoneNumberWithError(phoneNumber).format("E.164");
+export function formatPhoneNumber(
+  phoneNumber: string,
+  allowWrongNumber = false
+) {
+  try {
+    return parsePhoneNumberWithError(phoneNumber).format("E.164");
+  } catch (e) {
+    if (e instanceof ParseError && allowWrongNumber) {
+      return phoneNumber;
+    }
+
+    throw e;
+  }
 }
 
 export async function sendSMS(text: string, to: string) {
