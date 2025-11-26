@@ -3,7 +3,9 @@
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/index.ts",
-    "start": "bun src/index.ts"
+    "start": "bun src/index.ts",
+    "kvget": "bun src/scripts/kvget.ts",
+    "kvset": "bun src/scripts/kvset.ts"
   },
   "dependencies": {
     "android-sms-gateway": "^3.0.0",
